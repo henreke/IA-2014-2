@@ -1,0 +1,181 @@
+/* Problema das 8 rainhas
+ * 
+ *  Ighor Leonardo
+    Laerth Bernardo
+    Wolney Mello*/
+
+import java.io.Console;
+import java.util.Random;
+
+import javax.swing.Spring;
+class cidade{
+	public cidade(){}
+
+	public int x;
+	public int y;
+	public String nome;
+}
+class aeroporto{
+	public aeroporto()
+	{}
+	public int x;
+	public int y;
+	public String nome;
+}
+
+public class Resfriamento {
+	static int n=20;
+
+	static int resfriamento_simulado(cidade cidades[],aeroporto aeroportos[]){
+
+		double T = 2000; // temperatura
+                int h_corrente = calcularh(aeroportos,cidades);
+                
+		Random r = new Random();
+		int coluna;
+		int destinox;
+		int destinoy;
+		int delta_e;
+		int h_prox;
+		int origemx;
+		int origemy;
+		
+		while(true){
+                    
+
+			T = T - 0.01;
+			
+		    if ((T<=0)||(h_corrente==0)) //condicao de parada
+		    	break;
+		    System.out.println(T);
+		    
+                    
+		    coluna = r.nextInt(3); // escolhe uma rainha pela coluna
+            destinox = r.nextInt(n); //gera um destino
+		    destinoy=r.nextInt(n);
+            while((aeroportos[coluna].x==destinox)&&(aeroportos[coluna].y==destinoy)){ //garante que o destino nao seja a posicao atual
+		    	destinox = r.nextInt(n);
+		    	destinoy=r.nextInt(n);
+		    }
+                    
+		    origemx = aeroportos[coluna].x; //guarda a posição original da rainha
+		    origemy=aeroportos[coluna].y;
+		    aeroportos[coluna].x = destinox; //movendo a rainha
+		    aeroportos[coluna].y=destinoy;
+		    h_prox = calcularh(aeroportos,cidades);//calc o h do novo estado
+
+                    
+		    delta_e = h_prox - h_corrente;
+		    if(delta_e < 0) // achou um melhor estado
+		    	h_corrente = h_prox;
+		    else // acha um pior q vai ser considerado com a prob. de e^(delta_e/T)
+		    	if((r.nextDouble() <= Math.pow(Math.E, delta_e/T)))
+		    		h_corrente = h_prox;
+		    	else
+		    	{
+		    		aeroportos[coluna].x = origemx;
+		    		aeroportos[coluna].y=origemy;
+		    	}
+		    //System.out.println(Math.pow(Math.E, delta_e/T));
+		
+                }
+                
+		return h_corrente;
+	}
+
+	static int calcularh(aeroporto aeroportos[],cidade cidades[]){
+		int h = 0;
+		double aux=0;
+		double diagonal=Math.sqrt(2*Math.pow(n, 2))/2;//metade da diagonal do mapa completo
+		for(int a=0;a<3;a++){
+			for (int c=0;c<10;c++)
+			{
+				aux=Math.sqrt(Math.pow(aeroportos[a].x-cidades[c].x,2)+Math.pow(aeroportos[a].y-cidades[c].y,2));
+				if (aux<diagonal)//se a distancia da cidade for menor que metade de uma diagonal do mapa ela contabiliza
+					h+=aux;
+			}
+			
+		}
+		return h;
+	}
+
+public static void main(String args[]){
+
+	cidade cidades[]=new cidade[10];
+	aeroporto aeroportos[]=new aeroporto[3];
+
+		
+		cidades[0]= new cidade();
+		cidades[0].x = 19; // colocando uma rainha por coluna i
+		cidades[0].y=15;
+		cidades[0].nome=("Cidade0");
+		
+		cidades[1]= new cidade();
+		cidades[1].x = 9; // colocando uma rainha por coluna i
+		cidades[1].y=4;
+		cidades[1].nome=("Cidade1");
+		
+		cidades[2]= new cidade();
+		cidades[2].x = 9; // colocando uma rainha por coluna i
+		cidades[2].y=3;
+		cidades[2].nome=("Cidade2");
+		
+		cidades[3]= new cidade();
+		cidades[3].x = 19; // colocando uma rainha por coluna i
+		cidades[3].y=18;
+		cidades[3].nome=("Cidade3");
+		
+		cidades[4]= new cidade();
+		cidades[4].x = 7; // colocando uma rainha por coluna i
+		cidades[4].y=16;
+		cidades[4].nome=("Cidade4");
+		
+		cidades[5]= new cidade();
+		cidades[5].x = 16; // colocando uma rainha por coluna i
+		cidades[5].y=19;
+		cidades[5].nome=("Cidade5");
+		
+		cidades[6]= new cidade();
+		cidades[6].x = 18; // colocando uma rainha por coluna i
+		cidades[6].y=2;
+		cidades[6].nome=("Cidade6");
+		
+		cidades[7]= new cidade();
+		cidades[7].x = 10; // colocando uma rainha por coluna i
+		cidades[7].y=6;
+		cidades[7].nome=("Cidade7");
+		
+		cidades[8]= new cidade();
+		cidades[8].x = 3; // colocando uma rainha por coluna i
+		cidades[8].y=15;
+		cidades[8].nome=("Cidade8");
+		
+		cidades[9]= new cidade();
+		cidades[9].x = 12; // colocando uma rainha por coluna i
+		cidades[9].y=19;
+		cidades[9].nome=("Cidade9");
+	for(int i=0;i<3;i++)
+	{
+		Random r = new Random();
+		aeroportos[i]=new aeroporto();
+		aeroportos[i].x = r.nextInt(n); // colocando uma rainha por coluna i
+		aeroportos[i].y=r.nextInt(n);
+		aeroportos[i].nome=("Aeroporto"+i);
+		System.out.println("Aeroporto"+i+" X "+(aeroportos[i].x+1)+" Y "+(aeroportos[i].y+1));
+	}
+	
+        int resultado = resfriamento_simulado(cidades,aeroportos);
+	if(resultado == 0)
+		System.out.println("Solucao encontrada");
+	else
+		System.out.println("O no. de conflitos minimo eh de "+resultado);
+	for (int i=0;i<10;i++)
+	{
+		System.out.println(cidades[i].nome+ " X "+cidades[i].x+" Y"+cidades[i].y);
+	}
+	for (int i=0;i<3;i++)
+	{
+		System.out.println(aeroportos[i].nome+ " X "+(aeroportos[i].x+1)+" Y "+(aeroportos[i].y+1));
+	}
+}
+}
